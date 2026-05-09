@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Sleep Log" />
+  <title>Sleep Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f3;
+      --bg3: #eeede9;
+      --text: #1a1a1a;
+      --text2: #555551;
+      --text3: #99998f;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --blue-bg: #E6F1FB;
+      --blue-border: #B5D4F4;
+      --blue-icon: #378ADD;
+      --blue-text: #0C447C;
+      --blue-label: #185FA5;
+      --purple-bg: #EEEDFE;
+      --purple-border: #CED0F6;
+      --purple-icon: #7F77DD;
+      --purple-text: #3C3489;
+      --purple-label: #534AB7;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg2: #252523;
+        --bg3: #2e2e2b;
+        --text: #f0efe8;
+        --text2: #b0afa6;
+        --text3: #6e6d65;
+        --border: rgba(255,255,255,0.1);
+        --border2: rgba(255,255,255,0.2);
+        --blue-bg: #0c2a42;
+        --blue-border: #1a4a72;
+        --blue-icon: #85B7EB;
+        --blue-text: #B5D4F4;
+        --blue-label: #85B7EB;
+        --purple-bg: #1e1a42;
+        --purple-border: #3c3489;
+        --purple-icon: #AFA9EC;
+        --purple-text: #CECBF6;
+        --purple-label: #AFA9EC;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overscroll-behavior: none;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      min-height: 100%;
+    }
+
+    .header { text-align: center; padding-top: 1rem; }
+
+    .header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .header .subtitle {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 6px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text2);
+      letter-spacing: 0.04em;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .btn-log {
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 1rem;
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.12s, transform 0.1s;
+      color: var(--text);
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .btn-log:active { transform: scale(0.96); }
+
+    .btn-log .icon { font-size: 36px; line-height: 1; }
+    .btn-log .label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+    .btn-log .btn-hint { font-size: 11px; color: var(--text3); min-height: 16px; }
+
+    .btn-wake { border-color: var(--blue-border); }
+    .btn-wake:active { background: var(--blue-bg); }
+    .btn-wake .icon { color: var(--blue-icon); }
+
+    .btn-sleep { border-color: var(--purple-border); }
+    .btn-sleep:active { background: var(--purple-bg); }
+    .btn-sleep .icon { color: var(--purple-icon); }
+
+    @media (hover: hover) {
+      .btn-wake:hover { background: var(--blue-bg); }
+      .btn-sleep:hover { background: var(--purple-bg); }
+    }
+
+    .flash { animation: flashAnim 0.35s ease-out; }
+    @keyframes flashAnim {
+      0% { opacity: 0.4; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .clear-btn {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: var(--text3);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-md);
+      font-family: 'DM Mono', monospace;
+      touch-action: manipulation;
+    }
+
+    .clear-btn:active { color: #c0392b; background: rgba(192,57,43,0.1); }
+    @media (hover: hover) { .clear-btn:hover { color: #c0392b; background: rgba(192,57,43,0.1); } }
+
+    .log-empty {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      font-size: 13px;
+      color: var(--text3);
+      border: 0.5px dashed var(--border);
+      border-radius: var(--radius-md);
+      line-height: 1.6;
+    }
+
+    .log-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .log-entry {
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      animation: slideIn 0.2s ease-out;
+      overflow: hidden;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      font-size: 13px;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-wake { background: var(--blue-icon); }
+    .dot-sleep { background: var(--purple-icon); }
+
+    .entry-type {
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+      min-width: 48px;
+    }
+
+    .entry-time { color: var(--text); flex: 1; }
+    .entry-date { color: var(--text3); font-size: 11px; }
+
+    .delete-entry {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text3);
+      padding: 4px 6px;
+      border-radius: 4px;
+      line-height: 1;
+      font-size: 16px;
+      touch-action: manipulation;
+    }
+
+    .delete-entry:active { color: #c0392b; }
+
+    .duration-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 7px 34px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .dur-wake { background: var(--blue-bg); border-top-color: var(--blue-border); }
+    .dur-sleep { background: var(--purple-bg); border-top-color: var(--purple-border); }
+
+    .dur-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .dur-wake .dur-label { color: var(--blue-label); }
+    .dur-sleep .dur-label { color: var(--purple-label); }
+
+    .dur-value { font-size: 12px; font-weight: 500; }
+    .dur-wake .dur-value { color: var(--blue-text); }
+    .dur-sleep .dur-value { color: var(--purple-text); }
+
+    /* Sun and moon SVG icons (no external font dependency) */
+    .icon svg { width: 36px; height: 36px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>sleep log</h1>
+      <div class="subtitle" id="today-date"></div>
+    </div>
+
+    <div class="clock" id="live-clock"></div>
+
+    <div class="buttons">
+      <button class="btn-log btn-wake" id="btn-wake" onclick="logEvent('wake')">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </span>
+        <span class="label">woke up</span>
+        <span class="btn-hint" id="wake-hint"></span>
+      </button>
+      <button class="btn-log btn-sleep" id="btn-sleep" onclick="logEvent('sleep')">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+        <span class="label">fell asleep</span>
+        <span class="btn-hint" id="sleep-hint"></span>
+      </button>
+    </div>
+
+    <div>
+      <div class="section-header">
+        <span class="section-title">log</span>
+        <button class="clear-btn" onclick="clearLog()">clear all</button>
+      </div>
+      <div class="log-empty" id="empty-msg">no entries yet<br>tap a button to start logging</div>
+      <div class="log-list" id="log-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const KEY = 'sleeplog_v2';
+
+    function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+    function save(e) { try { localStorage.setItem(KEY, JSON.stringify(e)); } catch {} }
+
+    let entries = load();
+
+    function fmtTime(ts) {
+      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+
+    function fmtDate(ts) {
+      const d = new Date(ts), today = new Date(), yest = new Date(today);
+      yest.setDate(today.getDate() - 1);
+      if (d.toDateString() === today.toDateString()) return 'today';
+      if (d.toDateString() === yest.toDateString()) return 'yesterday';
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    function fmtDur(ms) {
+      const totalMins = Math.round(ms / 60000);
+      const h = Math.floor(totalMins / 60), m = totalMins % 60;
+      if (h === 0) return m + 'm';
+      if (m === 0) return h + 'h';
+      return h + 'h ' + m + 'm';
+    }
+
+    function getPrev(idx, type) {
+      for (let i = idx - 1; i >= 0; i--) {
+        if (entries[i].type === type) return entries[i];
+      }
+      return null;
+    }
+
+    function renderLog() {
+      const list = document.getElementById('log-list');
+      const empty = document.getElementById('empty-msg');
+      list.innerHTML = '';
+
+      if (entries.length === 0) { empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      [...entries].reverse().forEach((e, revIdx) => {
+        const realIdx = entries.length - 1 - revIdx;
+        let durHTML = '';
+
+        if (e.type === 'wake') {
+          const prev = getPrev(realIdx, 'sleep');
+          if (prev) durHTML = `<div class="duration-bar dur-wake"><span class="dur-label">slept for</span><span class="dur-value">${fmtDur(e.ts - prev.ts)}</span></div>`;
+        } else {
+          const prev = getPrev(realIdx, 'wake');
+          if (prev) durHTML = `<div class="duration-bar dur-sleep"><span class="dur-label">awake for</span><span class="dur-value">${fmtDur(e.ts - prev.ts)}</span></div>`;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `
+          <div class="entry-main">
+            <span class="dot dot-${e.type}"></span>
+            <span class="entry-type">${e.type === 'wake' ? 'woke' : 'sleep'}</span>
+            <span class="entry-time">${fmtTime(e.ts)}</span>
+            <span class="entry-date">${fmtDate(e.ts)}</span>
+            <button class="delete-entry" aria-label="delete" onclick="deleteEntry(${realIdx})">✕</button>
+          </div>
+          ${durHTML}
+        `;
+        list.appendChild(div);
+      });
+
+      updateHints();
+    }
+
+    function updateHints() {
+      const last = entries.length ? entries[entries.length - 1] : null;
+      const wh = document.getElementById('wake-hint');
+      const sh = document.getElementById('sleep-hint');
+      if (!last) { wh.textContent = ''; sh.textContent = ''; return; }
+      const now = Date.now();
+      if (last.type === 'sleep') {
+        wh.textContent = 'slept ' + fmtDur(now - last.ts);
+        sh.textContent = '';
+      } else {
+        sh.textContent = 'awake ' + fmtDur(now - last.ts);
+        wh.textContent = '';
+      }
+    }
+
+    function logEvent(type) {
+      entries.push({ type, ts: Date.now() });
+      save(entries);
+      const btn = document.getElementById('btn-' + type);
+      btn.classList.remove('flash');
+      void btn.offsetWidth;
+      btn.classList.add('flash');
+      renderLog();
+    }
+
+    function deleteEntry(idx) {
+      entries.splice(idx, 1);
+      save(entries);
+      renderLog();
+    }
+
+    function clearLog() {
+      if (!entries.length) return;
+      if (!confirm('Clear all entries?')) return;
+      entries = [];
+      save(entries);
+      renderLog();
+    }
+
+    function tick() {
+      const now = new Date();
+      document.getElementById('live-clock').textContent =
+        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      updateHints();
+    }
+
+    document.getElementById('today-date').textContent =
+      new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+
+    tick();
+    setInterval(tick, 1000);
+    renderLog();
+  </script>
+</body>
+</html>
