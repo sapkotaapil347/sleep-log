@@ -7,198 +7,166 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Sleep Log" />
-  <title>Sleep Log</title>
+  <meta name="apple-mobile-web-app-title" content="Kids Sleep Log" />
+  <title>Kids Sleep Log</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #ffffff; --bg2: #f5f5f3; --text: #1a1a1a; --text2: #555551; --text3: #99998f;
-      --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
-      --blue-bg: #E6F1FB; --blue-border: #B5D4F4; --blue-icon: #378ADD; --blue-text: #0C447C; --blue-label: #185FA5;
-      --purple-bg: #EEEDFE; --purple-border: #CED0F6; --purple-icon: #7F77DD; --purple-text: #3C3489; --purple-label: #534AB7;
-      --orange-bg: #FEF3E6; --orange-border: #F6D4A5; --orange-icon: #D4790A; --orange-text: #7C3E0C; --orange-label: #A35810;
-      --green: #3B6D11; --green-bg: #EAF3DE; --red: #A32D2D; --red-bg: #FCEBEB;
-      --radius-md: 8px; --radius-lg: 12px;
+      --bg:#ffffff; --bg2:#f5f5f3; --bg3:#ebebea;
+      --text:#1a1a1a; --text2:#555551; --text3:#99998f;
+      --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.20);
+      --blue-bg:#E6F1FB; --blue-border:#B5D4F4; --blue-icon:#378ADD; --blue-text:#0C447C; --blue-label:#185FA5;
+      --purple-bg:#EEEDFE; --purple-border:#CED0F6; --purple-icon:#7F77DD; --purple-text:#3C3489; --purple-label:#534AB7;
+      --orange-bg:#FEF3E6; --orange-border:#F6D4A5; --orange-icon:#D4790A; --orange-text:#7C3E0C; --orange-label:#A35810;
+      --green:#3B6D11; --green-bg:#EAF3DE;
+      --red:#A32D2D; --red-bg:#FCEBEB;
+      --radius-sm:6px; --radius-md:8px; --radius-lg:14px;
     }
-    @media (prefers-color-scheme: dark) {
+    @media (prefers-color-scheme:dark) {
       :root {
-        --bg: #1c1c1a; --bg2: #252523; --text: #f0efe8; --text2: #b0afa6; --text3: #6e6d65;
-        --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
-        --blue-bg: #0c2a42; --blue-border: #1a4a72; --blue-icon: #85B7EB; --blue-text: #B5D4F4; --blue-label: #85B7EB;
-        --purple-bg: #1e1a42; --purple-border: #3c3489; --purple-icon: #AFA9EC; --purple-text: #CECBF6; --purple-label: #AFA9EC;
-        --orange-bg: #2e1e06; --orange-border: #7c4a10; --orange-icon: #E8A94A; --orange-text: #F6D4A5; --orange-label: #E8A94A;
-        --green: #C0DD97; --green-bg: #173404; --red: #F09595; --red-bg: #501313;
+        --bg:#1c1c1a; --bg2:#252523; --bg3:#2e2e2b;
+        --text:#f0efe8; --text2:#b0afa6; --text3:#6e6d65;
+        --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.18);
+        --blue-bg:#0c2a42; --blue-border:#1a4a72; --blue-icon:#85B7EB; --blue-text:#B5D4F4; --blue-label:#85B7EB;
+        --purple-bg:#1e1a42; --purple-border:#3c3489; --purple-icon:#AFA9EC; --purple-text:#CECBF6; --purple-label:#AFA9EC;
+        --orange-bg:#2e1e06; --orange-border:#7c4a10; --orange-icon:#E8A94A; --orange-text:#F6D4A5; --orange-label:#E8A94A;
+        --green:#C0DD97; --green-bg:#173404;
+        --red:#F09595; --red-bg:#501313;
       }
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overscroll-behavior: none; }
-    .app { max-width: 480px; margin: 0 auto; padding: 2rem 1.25rem 4rem; display: flex; flex-direction: column; gap: 1.75rem; min-height: 100%; }
-    .header { text-align: center; padding-top: 1rem; }
-    .header h1 { font-family: 'DM Serif Display', serif; font-size: 32px; font-weight: 400; color: var(--text); letter-spacing: -0.5px; }
-    .header .subtitle { font-size: 11px; color: var(--text3); margin-top: 6px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .clock { text-align: center; font-size: 14px; color: var(--text2); letter-spacing: 0.04em; }
-    .sync-bar { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; color: var(--text3); letter-spacing: 0.05em; min-height: 20px; }
-    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
-    .sync-bar.synced .sync-dot { background: var(--green); } .sync-bar.synced { color: var(--green); }
-    .sync-bar.error .sync-dot { background: var(--red); } .sync-bar.error { color: var(--red); }
-    .sync-bar.syncing .sync-dot { background: var(--blue-icon); animation: pulse 1s infinite; } .sync-bar.syncing { color: var(--blue-label); }
-    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;overscroll-behavior:none}
+    .app{max-width:480px;margin:0 auto;padding:2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:2rem}
 
-    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .btn-log { border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 2.2rem 1rem; background: var(--bg); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: background 0.12s, transform 0.1s; color: var(--text); touch-action: manipulation; user-select: none; }
-    .btn-log:active { transform: scale(0.96); }
-    .btn-log.loading { opacity: 0.6; pointer-events: none; }
-    .btn-log .icon { font-size: 36px; line-height: 1; }
-    .btn-log .label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
-    .btn-log .btn-hint { font-size: 11px; color: var(--text3); min-height: 16px; }
-    .btn-wake { border-color: var(--blue-border); } .btn-wake:active { background: var(--blue-bg); } .btn-wake .icon { color: var(--blue-icon); }
-    .btn-sleep { border-color: var(--purple-border); } .btn-sleep:active { background: var(--purple-bg); } .btn-sleep .icon { color: var(--purple-icon); }
-    @media (hover: hover) { .btn-wake:hover{background:var(--blue-bg)} .btn-sleep:hover{background:var(--purple-bg)} }
-    .flash { animation: flashAnim 0.35s ease-out; }
-    @keyframes flashAnim { 0%{opacity:0.4;transform:scale(0.95)} 100%{opacity:1;transform:scale(1)} }
+    .header{text-align:center;padding-top:1rem}
+    .header h1{font-family:'DM Serif Display',serif;font-size:30px;font-weight:400;letter-spacing:-0.5px}
+    .header .subtitle{font-size:11px;color:var(--text3);margin-top:5px;letter-spacing:0.1em;text-transform:uppercase}
+    .clock{text-align:center;font-size:15px;color:var(--text2);letter-spacing:0.04em}
 
-    /* ── Evan button ── */
-    .evan-section { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    /* sync bar */
+    .sync-bar{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--text3);letter-spacing:0.05em;min-height:18px}
+    .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background 0.3s}
+    .sync-bar.synced{color:var(--green)} .sync-bar.synced .sync-dot{background:var(--green)}
+    .sync-bar.error{color:var(--red)} .sync-bar.error .sync-dot{background:var(--red)}
+    .sync-bar.syncing{color:var(--blue-label)} .sync-bar.syncing .sync-dot{background:var(--blue-icon);animation:pulse 1s infinite}
+    .sync-bar.stale{color:var(--orange-label)} .sync-bar.stale .sync-dot{background:var(--orange-icon)}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
 
-    .evan-hint {
-      font-size: 11px;
-      color: var(--text3);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.3s;
+    /* main buttons */
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btn-log{
+      border:0.5px solid var(--border2);border-radius:var(--radius-lg);
+      padding:2rem 1rem;background:var(--bg);cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:10px;
+      transition:background 0.12s,transform 0.08s;color:var(--text);
+      touch-action:manipulation;user-select:none;
     }
-    .evan-hint.hidden { opacity: 0; pointer-events: none; }
+    .btn-log:active{transform:scale(0.96)}
+    .btn-log.loading{opacity:0.55;pointer-events:none}
+    .btn-log .b-icon svg{width:34px;height:34px}
+    .btn-log .b-label{font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2)}
+    .btn-log .b-hint{font-size:11px;color:var(--text3);min-height:15px}
+    .btn-wake{border-color:var(--blue-border)} .btn-wake:active{background:var(--blue-bg)} .btn-wake .b-icon{color:var(--blue-icon)}
+    .btn-sleep{border-color:var(--purple-border)} .btn-sleep:active{background:var(--purple-bg)} .btn-sleep .b-icon{color:var(--purple-icon)}
+    @media(hover:hover){.btn-wake:hover{background:var(--blue-bg)}.btn-sleep:hover{background:var(--purple-bg)}}
 
-    .btn-evan-wrap { position: relative; width: 100%; }
-
-    .btn-evan {
-      width: 100%;
-      border: 0.5px solid var(--orange-border);
-      border-radius: var(--radius-md);
-      padding: 13px 18px;
-      background: var(--bg);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      color: var(--text2);
-      letter-spacing: 0.06em;
-      touch-action: manipulation;
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.12s, transform 0.1s, color 0.2s, border-color 0.2s;
+    /* evan button */
+    .btn-evan{
+      width:100%;border:0.5px solid var(--orange-border);border-radius:var(--radius-md);
+      padding:12px 18px;background:var(--bg);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-family:'DM Mono',monospace;font-size:13px;color:var(--orange-label);
+      letter-spacing:0.05em;touch-action:manipulation;user-select:none;
+      transition:background 0.12s,transform 0.08s;
     }
+    .btn-evan:active{background:var(--orange-bg);transform:scale(0.97)}
+    @media(hover:hover){.btn-evan:hover{background:var(--orange-bg)}}
 
-    .btn-evan .evan-icon { color: var(--orange-icon); font-size: 16px; }
+    .flash{animation:flashAnim 0.3s ease-out}
+    @keyframes flashAnim{0%{opacity:0.35;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}
 
-    /* locked state */
-    .btn-evan.locked {
-      opacity: 0.55;
-      cursor: not-allowed;
+    /* log */
+    .log-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .log-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3)}
+    .clear-btn{
+      font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;
+      padding:4px 8px;border-radius:var(--radius-sm);font-family:'DM Mono',monospace;
+      touch-action:manipulation;letter-spacing:0.04em;
+    }
+    .clear-btn:active{color:var(--red);background:var(--red-bg)}
+    @media(hover:hover){.clear-btn:hover{color:var(--red);background:var(--red-bg)}}
+
+    .log-empty{
+      text-align:center;padding:3rem 1rem;font-size:13px;color:var(--text3);
+      border:0.5px dashed var(--border2);border-radius:var(--radius-md);line-height:1.7;
     }
 
-    /* unlocked state */
-    .btn-evan.unlocked {
-      border-color: var(--orange-border);
-      color: var(--orange-text);
-      opacity: 1;
+    /* skeleton loader */
+    .skeleton-group{margin-bottom:20px}
+    .skeleton-label{height:12px;width:80px;background:var(--bg3);border-radius:4px;margin-bottom:10px;animation:shimmer 1.4s infinite}
+    .skeleton-row{display:flex;gap:0;margin-bottom:6px;align-items:stretch}
+    .skeleton-strip{width:32px;display:flex;flex-direction:column;align-items:center;padding-top:12px;gap:0}
+    .skeleton-dot{width:9px;height:9px;border-radius:50%;background:var(--bg3);animation:shimmer 1.4s infinite}
+    .skeleton-line{width:1.5px;flex:1;min-height:8px;background:var(--bg3);margin-top:4px}
+    .skeleton-card{flex:1;background:var(--bg2);border-radius:var(--radius-md);padding:10px 12px;border:0.5px solid var(--border)}
+    .skeleton-text{height:10px;background:var(--bg3);border-radius:3px;margin-bottom:7px;animation:shimmer 1.4s infinite}
+    .skeleton-text.wide{width:70%} .skeleton-text.narrow{width:40%}
+    @keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.4}}
+
+    /* day group */
+    .day-group{margin-bottom:20px}
+    .day-label{
+      font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);
+      margin-bottom:8px;display:flex;align-items:center;gap:10px;
     }
-    .btn-evan.unlocked:active { background: var(--orange-bg); transform: scale(0.97); }
-    @media (hover: hover) { .btn-evan.unlocked:hover { background: var(--orange-bg); } }
+    .day-label::after{content:'';flex:1;height:0.5px;background:var(--border2)}
 
-    /* long-press progress ring */
-    .evan-progress {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .entry-row{display:flex;align-items:stretch;gap:0;margin-bottom:4px;animation:slideIn 0.18s ease-out}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+    .entry-strip{width:32px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:14px}
+    .strip-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .strip-dot.wake{background:var(--blue-icon)} .strip-dot.sleep{background:var(--purple-icon)} .strip-dot.evan{background:var(--orange-icon)}
+    .strip-line{width:1.5px;flex:1;min-height:8px;background:var(--border2);margin-top:4px}
+
+    .entry-card{
+      flex:1;background:var(--bg2);border-radius:var(--radius-md);
+      padding:10px 12px 10px 10px;display:flex;align-items:center;gap:10px;
+      border:0.5px solid var(--border);
     }
-
-    .evan-progress svg {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 36px;
-      height: 36px;
-      opacity: 0;
-      transition: opacity 0.15s;
+    .entry-info{flex:1;display:flex;flex-direction:column;gap:3px}
+    .entry-type-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
+    .entry-type-label.wake{color:var(--blue-label)} .entry-type-label.sleep{color:var(--purple-label)} .entry-type-label.evan{color:var(--orange-label)}
+    .entry-time-big{font-size:18px;color:var(--text);letter-spacing:-0.02em;line-height:1.1}
+    .entry-dur{font-size:11px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:5px}
+    .dur-pill{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500;
     }
-
-    .btn-evan.pressing .evan-progress svg { opacity: 1; }
-
-    .evan-progress circle {
-      fill: none;
-      stroke: var(--orange-icon);
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-dasharray: 88;
-      stroke-dashoffset: 88;
-      transform-origin: center;
-      transform: rotate(-90deg);
-      transition: stroke-dashoffset 0.05s linear;
+    .dur-pill.wake{background:var(--blue-bg);color:var(--blue-text)}
+    .dur-pill.sleep{background:var(--purple-bg);color:var(--purple-text)}
+    .entry-del{
+      background:none;border:none;cursor:pointer;color:var(--text3);
+      padding:6px;border-radius:var(--radius-sm);line-height:1;font-size:14px;
+      touch-action:manipulation;flex-shrink:0;align-self:flex-start;
     }
+    .entry-del:active{color:var(--red)}
 
-    /* lock icon */
-    .evan-lock {
-      font-size: 13px;
-      color: var(--text3);
-      transition: opacity 0.2s;
+    /* stale notice banner */
+    .stale-banner{
+      display:none;background:var(--orange-bg);border:0.5px solid var(--orange-border);
+      border-radius:var(--radius-md);padding:10px 14px;font-size:12px;color:var(--orange-label);
+      text-align:center;letter-spacing:0.03em;
     }
-    .btn-evan.unlocked .evan-lock { opacity: 0; width: 0; overflow: hidden; }
-
-    /* auto-lock countdown */
-    .evan-countdown {
-      font-size: 11px;
-      color: var(--orange-label);
-      letter-spacing: 0.05em;
-      min-height: 16px;
-      text-align: center;
-      transition: opacity 0.3s;
-    }
-    .evan-countdown.hidden { opacity: 0; }
-
-    /* log section */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); }
-    .clear-btn { font-size: 11px; letter-spacing: 0.05em; color: var(--text3); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-md); font-family: 'DM Mono', monospace; touch-action: manipulation; }
-    .clear-btn:active { color: var(--red); background: var(--red-bg); }
-    @media (hover: hover) { .clear-btn:hover{color:var(--red);background:var(--red-bg)} }
-    .log-empty { text-align: center; padding: 2.5rem 1rem; font-size: 13px; color: var(--text3); border: 0.5px dashed var(--border); border-radius: var(--radius-md); line-height: 1.6; }
-    .log-list { display: flex; flex-direction: column; gap: 8px; }
-    .log-entry { border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg); animation: slideIn 0.2s ease-out; overflow: hidden; }
-    @keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-    .entry-main { display: flex; align-items: center; gap: 12px; padding: 11px 14px; font-size: 13px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-wake { background: var(--blue-icon); } .dot-sleep { background: var(--purple-icon); } .dot-evan { background: var(--orange-icon); }
-    .entry-type { color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; min-width: 48px; }
-    .entry-time { color: var(--text); flex: 1; } .entry-date { color: var(--text3); font-size: 11px; }
-    .delete-entry { background: none; border: none; cursor: pointer; color: var(--text3); padding: 4px 6px; border-radius: 4px; line-height: 1; font-size: 16px; touch-action: manipulation; }
-    .delete-entry:active { color: var(--red); }
-    .duration-bar { display: flex; align-items: center; gap: 8px; padding: 6px 14px 7px 34px; border-top: 0.5px solid var(--border); }
-    .dur-wake { background: var(--blue-bg); border-top-color: var(--blue-border); }
-    .dur-sleep { background: var(--purple-bg); border-top-color: var(--purple-border); }
-    .dur-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
-    .dur-wake .dur-label { color: var(--blue-label); } .dur-sleep .dur-label { color: var(--purple-label); }
-    .dur-value { font-size: 12px; font-weight: 500; }
-    .dur-wake .dur-value { color: var(--blue-text); } .dur-sleep .dur-value { color: var(--purple-text); }
-    .icon svg { width: 36px; height: 36px; }
+    .stale-banner.visible{display:block}
   </style>
 </head>
 <body>
 <div class="app">
+
   <div class="header">
-    <h1>sleep log</h1>
+    <h1>Kids Sleep Log</h1>
     <div class="subtitle" id="today-date"></div>
   </div>
 
@@ -206,12 +174,16 @@
 
   <div class="sync-bar" id="sync-bar">
     <span class="sync-dot"></span>
-    <span id="sync-msg">not connected</span>
+    <span id="sync-msg">loading...</span>
+  </div>
+
+  <div class="stale-banner" id="stale-banner">
+    showing cached data — syncing in background
   </div>
 
   <div class="buttons">
     <button class="btn-log btn-wake" id="btn-wake" onclick="logEvent('wake')">
-      <span class="icon">
+      <span class="b-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4"/>
           <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
@@ -220,214 +192,144 @@
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       </span>
-      <span class="label">woke up</span>
-      <span class="btn-hint" id="wake-hint"></span>
+      <span class="b-label">Neil woke up</span>
+      <span class="b-hint" id="wake-hint"></span>
     </button>
     <button class="btn-log btn-sleep" id="btn-sleep" onclick="logEvent('sleep')">
-      <span class="icon">
+      <span class="b-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </span>
-      <span class="label">fell asleep</span>
-      <span class="btn-hint" id="sleep-hint"></span>
+      <span class="b-label">Neil fell asleep</span>
+      <span class="b-hint" id="sleep-hint"></span>
     </button>
   </div>
 
-  <!-- Evan button -->
-  <div class="evan-section">
-    <div class="evan-hint" id="evan-hint">
-      <span>⟵ hold to unlock</span>
-    </div>
-
-    <div class="btn-evan-wrap">
-      <button class="btn-evan locked" id="btn-evan"
-        onmousedown="evanPressStart(event)"
-        ontouchstart="evanPressStart(event)"
-        onmouseup="evanPressEnd(event)"
-        onmouseleave="evanPressEnd(event)"
-        ontouchend="evanPressEnd(event)"
-        ontouchcancel="evanPressEnd(event)"
-        onclick="evanClick(event)">
-        <span class="evan-lock">🔒</span>
-        <span class="evan-icon">☀️</span>
-        <span>Evan Woke Up!</span>
-        <div class="evan-progress">
-          <svg viewBox="0 0 36 36" id="evan-ring-svg">
-            <circle id="evan-ring" cx="18" cy="18" r="14"/>
-          </svg>
-        </div>
-      </button>
-    </div>
-
-    <div class="evan-countdown hidden" id="evan-countdown"></div>
-  </div>
+  <button class="btn-evan" id="btn-evan" onclick="logEvan()">
+    ☀️ Evan Woke Up!
+  </button>
 
   <div>
-    <div class="section-header">
-      <span class="section-title">log</span>
+    <div class="log-top">
+      <span class="log-title">log</span>
       <button class="clear-btn" onclick="clearLog()">clear all</button>
     </div>
-    <div class="log-empty" id="empty-msg">no entries yet<br>tap a button to start logging</div>
-    <div class="log-list" id="log-list"></div>
+    <div class="log-empty" id="empty-msg" style="display:none">no entries yet<br>tap a button to start logging</div>
+    <div id="log-list"></div>
   </div>
-</div>
 
+</div>
 <script>
-  // ── PASTE YOUR APPS SCRIPT URL BETWEEN THE QUOTES BELOW ──────────────────────
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmBKdVghaCa3FWfUOp0RXh5dh3pLjqAj3BO4-x78buvCKS3c6gHwEmCk68sKm11FKWJA/exec';
+  // ── PASTE YOUR APPS SCRIPT URL HERE ──────────────────────────────────────────
+  const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
   // ─────────────────────────────────────────────────────────────────────────────
 
-  const KEY = 'sleeplog_v3';
+  const KEY       = 'sleeplog_v3';       // entries cache
+  const META_KEY  = 'sleeplog_meta';     // last sync timestamp
+  const SYNC_TTL  = 30 * 1000;          // consider cache fresh for 30s
+
   let entries = [];
+  let syncInFlight = false;
 
-  // ── Evan button state ──
-  const HOLD_MS = 1500;       // hold duration to unlock
-  const AUTO_LOCK_MS = 8000;  // seconds before it re-locks
-  let evanUnlocked = false;
-  let evanPressTimer = null;
-  let evanPressStart_ = null;
-  let evanLockTimer = null;
-  let evanCountdownInterval = null;
-  let evanProgressRaf = null;
+  // ── local storage ──
+  function localSave()  { try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch {} }
+  function localLoad()  { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+  function saveMeta(ts) { try { localStorage.setItem(META_KEY, String(ts)); } catch {} }
+  function loadMeta()   { try { return parseInt(localStorage.getItem(META_KEY) || '0'); } catch { return 0; } }
 
-  function evanPressStart(e) {
-    if (evanUnlocked) return; // already unlocked, just wait for click
-    e.preventDefault();
-    const btn = document.getElementById('btn-evan');
-    btn.classList.add('pressing');
-    evanPressStart_ = Date.now();
-
-    function animate() {
-      const elapsed = Date.now() - evanPressStart_;
-      const pct = Math.min(elapsed / HOLD_MS, 1);
-      const ring = document.getElementById('evan-ring');
-      ring.style.strokeDashoffset = 88 - pct * 88;
-      if (pct < 1) {
-        evanProgressRaf = requestAnimationFrame(animate);
-      }
-    }
-    evanProgressRaf = requestAnimationFrame(animate);
-
-    evanPressTimer = setTimeout(() => {
-      unlockEvan();
-    }, HOLD_MS);
-  }
-
-  function evanPressEnd(e) {
-    if (evanUnlocked) return;
-    clearTimeout(evanPressTimer);
-    cancelAnimationFrame(evanProgressRaf);
-    const btn = document.getElementById('btn-evan');
-    btn.classList.remove('pressing');
-    const ring = document.getElementById('evan-ring');
-    ring.style.strokeDashoffset = 88;
-  }
-
-  function unlockEvan() {
-    evanUnlocked = true;
-    const btn = document.getElementById('btn-evan');
-    btn.classList.remove('locked', 'pressing');
-    btn.classList.add('unlocked');
-    const ring = document.getElementById('evan-ring');
-    ring.style.strokeDashoffset = 88;
-
-    document.getElementById('evan-hint').classList.add('hidden');
-    document.getElementById('evan-ring-svg').style.opacity = 0;
-
-    // start auto-lock countdown
-    startEvanCountdown();
-  }
-
-  function lockEvan() {
-    evanUnlocked = false;
-    const btn = document.getElementById('btn-evan');
-    btn.classList.remove('unlocked');
-    btn.classList.add('locked');
-    document.getElementById('evan-hint').classList.remove('hidden');
-    document.getElementById('evan-countdown').classList.add('hidden');
-    document.getElementById('evan-countdown').textContent = '';
-    clearInterval(evanCountdownInterval);
-    clearTimeout(evanLockTimer);
-  }
-
-  function startEvanCountdown() {
-    const cd = document.getElementById('evan-countdown');
-    cd.classList.remove('hidden');
-    let remaining = Math.ceil(AUTO_LOCK_MS / 1000);
-    cd.textContent = `locks in ${remaining}s`;
-    evanCountdownInterval = setInterval(() => {
-      remaining--;
-      if (remaining <= 0) {
-        clearInterval(evanCountdownInterval);
-        cd.textContent = '';
-        cd.classList.add('hidden');
-      } else {
-        cd.textContent = `locks in ${remaining}s`;
-      }
-    }, 1000);
-    evanLockTimer = setTimeout(lockEvan, AUTO_LOCK_MS);
-  }
-
-  function evanClick(e) {
-    if (!evanUnlocked) return; // prevent accidental taps while locked
-    // reset auto-lock timer on each tap
-    clearTimeout(evanLockTimer);
-    clearInterval(evanCountdownInterval);
-    logEvent('evan');
-    // re-start countdown after log
-    startEvanCountdown();
-
-    const btn = document.getElementById('btn-evan');
-    btn.classList.remove('flash');
-    void btn.offsetWidth;
-    btn.classList.add('flash');
-  }
-
-  // ── Sync helpers ──
-  function localSave() { try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch {} }
-  function localLoad() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
-
+  // ── sync status UI ──
   function setSyncStatus(state, msg) {
     const bar = document.getElementById('sync-bar');
     bar.className = 'sync-bar ' + state;
     document.getElementById('sync-msg').textContent = msg;
   }
 
+  function showStaleBanner(show) {
+    document.getElementById('stale-banner').className = 'stale-banner' + (show ? ' visible' : '');
+  }
+
   const hasScript = SCRIPT_URL && SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
 
-  async function fetchEntries() {
-    if (!hasScript) { entries = localLoad(); renderLog(); setSyncStatus('', 'local only'); return; }
-    setSyncStatus('syncing', 'loading...');
-    try {
-      const res = await fetch(SCRIPT_URL + '?action=getAll');
-      const data = await res.json();
-      if (!data.ok) throw new Error();
-      entries = data.entries.map(e => ({ id: e.id, type: e.type, ts: Number(e.ts) }));
-      entries.sort((a, b) => a.ts - b.ts);
-      localSave();
-      setSyncStatus('synced', 'synced');
-    } catch {
-      entries = localLoad();
-      setSyncStatus('error', 'offline — showing local');
+  // ── INSTANT LOAD: show local cache immediately, sync in background ──
+  function initLoad() {
+    const cached = localLoad();
+    if (cached.length > 0) {
+      entries = cached;
+      renderLog();                        // show immediately from cache
+      const age = Date.now() - loadMeta();
+      if (age < SYNC_TTL) {
+        setSyncStatus('synced', 'synced');
+        return;                           // cache is fresh, skip fetch
+      }
+      showStaleBanner(true);             // cache is stale, show notice
+      setSyncStatus('stale', 'refreshing...');
+    } else {
+      renderLog();
+      setSyncStatus('syncing', 'loading...');
     }
-    renderLog();
+
+    if (hasScript) backgroundSync();
+    else setSyncStatus('', 'local only');
+  }
+
+  // ── background sync: fetch without blocking UI ──
+  async function backgroundSync() {
+    if (syncInFlight) return;
+    syncInFlight = true;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      const res = await fetch(SCRIPT_URL + '?action=getAll', { signal: controller.signal });
+      clearTimeout(timeout);
+      const data = await res.json();
+      if (!data.ok) throw new Error('bad response');
+      const fresh = data.entries.map(e => ({ id: e.id, type: e.type, ts: Number(e.ts) }));
+      fresh.sort((a, b) => a.ts - b.ts);
+
+      // only re-render if data actually changed
+      if (JSON.stringify(fresh) !== JSON.stringify(entries)) {
+        entries = fresh;
+        localSave();
+        renderLog();
+      }
+      saveMeta(Date.now());
+      showStaleBanner(false);
+      setSyncStatus('synced', 'synced');
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        setSyncStatus('error', 'sync timed out — showing cached');
+      } else {
+        setSyncStatus('error', 'sync failed — showing cached');
+      }
+      showStaleBanner(false);
+    }
+    syncInFlight = false;
   }
 
   async function pushEntry(entry) {
     if (!hasScript) return entry;
     try {
-      const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ type: entry.type, ts: entry.ts }) });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ type: entry.type, ts: entry.ts }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
       const data = await res.json();
-      if (data.ok) { entry.id = data.id; setSyncStatus('synced', 'synced'); }
+      if (data.ok) { entry.id = data.id; saveMeta(Date.now()); setSyncStatus('synced', 'synced'); }
     } catch { setSyncStatus('error', 'saved locally, sync failed'); }
     return entry;
   }
 
   async function deleteRemote(id) {
     if (!hasScript || !id) return;
-    try { await fetch(SCRIPT_URL + '?action=delete&id=' + encodeURIComponent(id)); setSyncStatus('synced', 'synced'); }
-    catch { setSyncStatus('error', 'local delete only'); }
+    try {
+      await fetch(SCRIPT_URL + '?action=delete&id=' + encodeURIComponent(id));
+      setSyncStatus('synced', 'synced');
+    } catch { setSyncStatus('error', 'local delete only'); }
   }
 
   async function clearRemote() {
@@ -436,65 +338,125 @@
     catch { setSyncStatus('error', 'local clear only'); }
   }
 
-  // ── Formatting ──
-  function fmtTime(ts) { return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); }
-
-  function fmtDate(ts) {
-    const d = new Date(ts), today = new Date(), yest = new Date(today);
-    yest.setDate(today.getDate() - 1);
-    if (d.toDateString() === today.toDateString()) return 'today';
-    if (d.toDateString() === yest.toDateString()) return 'yesterday';
-    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  // ── formatting ──
+  function fmtTime(ts) {
+    return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', hour12:true });
   }
 
   function fmtDur(ms) {
     const t = Math.round(ms / 60000), h = Math.floor(t / 60), m = t % 60;
-    if (h === 0) return m + 'm'; if (m === 0) return h + 'h'; return h + 'h ' + m + 'm';
+    if (h === 0) return m + 'm';
+    if (m === 0) return h + 'h';
+    return h + 'h ' + m + 'm';
   }
 
-  function getPrev(idx, type) {
-    for (let i = idx - 1; i >= 0; i--) { if (entries[i].type === type) return entries[i]; }
-    return null;
+  function dayKey(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
   }
 
-  function labelFor(type) {
-    if (type === 'wake') return 'woke';
-    if (type === 'sleep') return 'sleep';
-    if (type === 'evan') return 'evan';
+  function dayLabel(ts) {
+    const d = new Date(ts), today = new Date(), yest = new Date(today);
+    yest.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'today';
+    if (d.toDateString() === yest.toDateString()) return 'yesterday';
+    return d.toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+  }
+
+  function entryLabel(type) {
+    if (type === 'wake')  return 'Neil woke up';
+    if (type === 'sleep') return 'Neil fell asleep';
+    if (type === 'evan')  return 'Evan woke up';
     return type;
   }
 
-  function renderLog() {
+  function getPrevOfType(allEntries, idx, type) {
+    for (let i = idx - 1; i >= 0; i--) {
+      if (allEntries[i].type === type) return allEntries[i];
+    }
+    return null;
+  }
+
+  // ── skeleton loader ──
+  function renderSkeleton() {
     const list = document.getElementById('log-list');
+    list.innerHTML = `
+      <div class="skeleton-group">
+        <div class="skeleton-label"></div>
+        ${[1,2,3].map((_, i) => `
+          <div class="skeleton-row">
+            <div class="skeleton-strip">
+              <div class="skeleton-dot"></div>
+              ${i < 2 ? '<div class="skeleton-line"></div>' : ''}
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton-text narrow"></div>
+              <div class="skeleton-text wide"></div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // ── main render ──
+  function renderLog() {
+    const list  = document.getElementById('log-list');
     const empty = document.getElementById('empty-msg');
     list.innerHTML = '';
+
     if (entries.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
 
-    [...entries].reverse().forEach((e, revIdx) => {
-      const realIdx = entries.length - 1 - revIdx;
-      let durHTML = '';
+    // group by day
+    const groups = {}, groupOrder = [];
+    entries.forEach((e, i) => {
+      const k = dayKey(e.ts);
+      if (!groups[k]) { groups[k] = []; groupOrder.unshift(k); }
+      groups[k].push({ ...e, _origIdx: i });
+    });
 
-      if (e.type === 'wake') {
-        const prev = getPrev(realIdx, 'sleep');
-        if (prev) durHTML = `<div class="duration-bar dur-wake"><span class="dur-label">slept for</span><span class="dur-value">${fmtDur(e.ts - prev.ts)}</span></div>`;
-      } else if (e.type === 'sleep') {
-        const prev = getPrev(realIdx, 'wake');
-        if (prev) durHTML = `<div class="duration-bar dur-sleep"><span class="dur-label">awake for</span><span class="dur-value">${fmtDur(e.ts - prev.ts)}</span></div>`;
-      }
+    groupOrder.forEach(k => {
+      const dayEntries = groups[k].slice().reverse();
+      const wrapper = document.createElement('div');
+      wrapper.className = 'day-group';
 
-      const safeId = encodeURIComponent(e.id || '');
-      const div = document.createElement('div');
-      div.className = 'log-entry';
-      div.innerHTML = `
-        <div class="entry-main">
-          <span class="dot dot-${e.type}"></span>
-          <span class="entry-type">${labelFor(e.type)}</span>
-          <span class="entry-time">${fmtTime(e.ts)}</span>
-          <span class="entry-date">${fmtDate(e.ts)}</span>
-          <button class="delete-entry" aria-label="delete" onclick="deleteEntry(${realIdx},'${safeId}')">✕</button>
-        </div>${durHTML}`;
-      list.appendChild(div);
+      const lbl = document.createElement('div');
+      lbl.className = 'day-label';
+      lbl.textContent = dayLabel(dayEntries[0].ts);
+      wrapper.appendChild(lbl);
+
+      dayEntries.forEach((e, di) => {
+        const origIdx = e._origIdx;
+        let durHTML = '';
+        if (e.type === 'wake') {
+          const prev = getPrevOfType(entries, origIdx, 'sleep');
+          if (prev) durHTML = `<span class="dur-pill wake">slept ${fmtDur(e.ts - prev.ts)}</span>`;
+        } else if (e.type === 'sleep') {
+          const prev = getPrevOfType(entries, origIdx, 'wake');
+          if (prev) durHTML = `<span class="dur-pill sleep">awake ${fmtDur(e.ts - prev.ts)}</span>`;
+        }
+
+        const isLast = di === dayEntries.length - 1;
+        const safeId = encodeURIComponent(e.id || '');
+
+        const row = document.createElement('div');
+        row.className = 'entry-row';
+        row.innerHTML = `
+          <div class="entry-strip">
+            <span class="strip-dot ${e.type}"></span>
+            ${!isLast ? '<span class="strip-line"></span>' : ''}
+          </div>
+          <div class="entry-card">
+            <div class="entry-info">
+              <span class="entry-type-label ${e.type}">${entryLabel(e.type)}</span>
+              <span class="entry-time-big">${fmtTime(e.ts)}</span>
+              ${durHTML ? `<div class="entry-dur">${durHTML}</div>` : ''}
+            </div>
+            <button class="entry-del" aria-label="delete" onclick="deleteEntry(${origIdx},'${safeId}')">✕</button>
+          </div>`;
+        wrapper.appendChild(row);
+      });
+
+      list.appendChild(wrapper);
     });
 
     updateHints();
@@ -505,35 +467,42 @@
     const wh = document.getElementById('wake-hint'), sh = document.getElementById('sleep-hint');
     if (!last) { wh.textContent = ''; sh.textContent = ''; return; }
     const now = Date.now();
-    if (last.type === 'sleep') { wh.textContent = 'slept ' + fmtDur(now - last.ts); sh.textContent = ''; }
-    else if (last.type === 'wake') { sh.textContent = 'awake ' + fmtDur(now - last.ts); wh.textContent = ''; }
-    else { wh.textContent = ''; sh.textContent = ''; }
+    if (last.type === 'sleep')      { wh.textContent = 'slept ' + fmtDur(now - last.ts); sh.textContent = ''; }
+    else if (last.type === 'wake')  { sh.textContent = 'awake ' + fmtDur(now - last.ts); wh.textContent = ''; }
+    else                            { wh.textContent = ''; sh.textContent = ''; }
   }
 
   async function logEvent(type) {
-    const btnId = type === 'evan' ? 'btn-evan' : 'btn-' + type;
-    const btn = document.getElementById(btnId);
-    if (type !== 'evan') btn.classList.add('loading');
-    let entry = { type, ts: Date.now(), id: null };
+    const btn = document.getElementById('btn-' + type);
+    btn.classList.add('loading');
+    const entry = { type, ts: Date.now(), id: null };
     entries.push(entry);
-    localSave();
-    renderLog();
+    localSave(); renderLog();
     setSyncStatus('syncing', 'saving...');
-    entry = await pushEntry(entry);
+    await pushEntry(entry);
     localSave();
-    if (type !== 'evan') {
-      btn.classList.remove('loading');
-      btn.classList.remove('flash');
-      void btn.offsetWidth;
-      btn.classList.add('flash');
-    }
+    btn.classList.remove('loading', 'flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
+  }
+
+  async function logEvan() {
+    const btn = document.getElementById('btn-evan');
+    const entry = { type: 'evan', ts: Date.now(), id: null };
+    entries.push(entry);
+    localSave(); renderLog();
+    setSyncStatus('syncing', 'saving...');
+    await pushEntry(entry);
+    localSave();
+    btn.classList.remove('flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
   }
 
   async function deleteEntry(idx, encodedId) {
     const id = decodeURIComponent(encodedId);
     entries.splice(idx, 1);
-    localSave();
-    renderLog();
+    localSave(); renderLog();
     setSyncStatus('syncing', 'deleting...');
     await deleteRemote(id);
   }
@@ -541,26 +510,35 @@
   async function clearLog() {
     if (!entries.length) return;
     if (!confirm('Clear all entries?')) return;
-    entries = [];
-    localSave();
-    renderLog();
+    entries = []; localSave(); renderLog();
     setSyncStatus('syncing', 'clearing...');
     await clearRemote();
   }
 
+  // ── clock ──
   function tick() {
     document.getElementById('live-clock').textContent =
-      new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
     updateHints();
   }
 
   document.getElementById('today-date').textContent =
-    new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    new Date().toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
 
-  if (!hasScript) setSyncStatus('', 'local only — no sync configured');
+  // show skeleton only if no cache
+  if (localLoad().length === 0) renderSkeleton();
+
   tick();
   setInterval(tick, 1000);
-  fetchEntries();
+  initLoad();
+
+  // re-sync when tab becomes visible again (e.g. switching back from another app)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && hasScript) {
+      const age = Date.now() - loadMeta();
+      if (age > SYNC_TTL) backgroundSync();
+    }
+  });
 </script>
 </body>
 </html>
