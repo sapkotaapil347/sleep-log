@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:#ffffff; --bg2:#f5f5f3; --bg3:#ebebea;
+      --bg:#ffffff; --bg2:#f5f5f3; --bg3:#e8e8e6;
       --text:#1a1a1a; --text2:#555551; --text3:#99998f;
       --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.20);
       --blue-bg:#E6F1FB; --blue-border:#B5D4F4; --blue-icon:#378ADD; --blue-text:#0C447C; --blue-label:#185FA5;
@@ -21,11 +21,11 @@
       --orange-bg:#FEF3E6; --orange-border:#F6D4A5; --orange-icon:#D4790A; --orange-text:#7C3E0C; --orange-label:#A35810;
       --green:#3B6D11; --green-bg:#EAF3DE;
       --red:#A32D2D; --red-bg:#FCEBEB;
-      --radius-sm:6px; --radius-md:8px; --radius-lg:14px;
+      --radius-sm:6px; --radius-md:10px; --radius-lg:14px; --radius-xl:18px;
     }
     @media (prefers-color-scheme:dark) {
       :root {
-        --bg:#1c1c1a; --bg2:#252523; --bg3:#2e2e2b;
+        --bg:#1c1c1a; --bg2:#252523; --bg3:#333330;
         --text:#f0efe8; --text2:#b0afa6; --text3:#6e6d65;
         --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.18);
         --blue-bg:#0c2a42; --blue-border:#1a4a72; --blue-icon:#85B7EB; --blue-text:#B5D4F4; --blue-label:#85B7EB;
@@ -44,7 +44,6 @@
     .header .subtitle{font-size:11px;color:var(--text3);margin-top:5px;letter-spacing:0.1em;text-transform:uppercase}
     .clock{text-align:center;font-size:15px;color:var(--text2);letter-spacing:0.04em}
 
-    /* sync bar */
     .sync-bar{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--text3);letter-spacing:0.05em;min-height:18px}
     .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background 0.3s}
     .sync-bar.synced{color:var(--green)} .sync-bar.synced .sync-dot{background:var(--green)}
@@ -53,7 +52,9 @@
     .sync-bar.stale{color:var(--orange-label)} .sync-bar.stale .sync-dot{background:var(--orange-icon)}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
 
-    /* main buttons */
+    .stale-banner{display:none;background:var(--orange-bg);border:0.5px solid var(--orange-border);border-radius:var(--radius-md);padding:10px 14px;font-size:12px;color:var(--orange-label);text-align:center;letter-spacing:0.03em}
+    .stale-banner.visible{display:block}
+
     .buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .btn-log{
       border:0.5px solid var(--border2);border-radius:var(--radius-lg);
@@ -63,7 +64,6 @@
       touch-action:manipulation;user-select:none;
     }
     .btn-log:active{transform:scale(0.96)}
-    .btn-log.loading{opacity:0.55;pointer-events:none}
     .btn-log .b-icon svg{width:34px;height:34px}
     .btn-log .b-label{font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2)}
     .btn-log .b-hint{font-size:11px;color:var(--text3);min-height:15px}
@@ -71,7 +71,6 @@
     .btn-sleep{border-color:var(--purple-border)} .btn-sleep:active{background:var(--purple-bg)} .btn-sleep .b-icon{color:var(--purple-icon)}
     @media(hover:hover){.btn-wake:hover{background:var(--blue-bg)}.btn-sleep:hover{background:var(--purple-bg)}}
 
-    /* evan button */
     .btn-evan{
       width:100%;border:0.5px solid var(--orange-border);border-radius:var(--radius-md);
       padding:12px 18px;background:var(--bg);cursor:pointer;
@@ -83,26 +82,110 @@
     .btn-evan:active{background:var(--orange-bg);transform:scale(0.97)}
     @media(hover:hover){.btn-evan:hover{background:var(--orange-bg)}}
 
+    /* ── MODAL ── */
+    .modal-overlay{
+      position:fixed;inset:0;z-index:100;
+      background:rgba(0,0,0,0.45);backdrop-filter:blur(3px);
+      display:flex;align-items:flex-end;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.2s;
+    }
+    .modal-overlay.open{opacity:1;pointer-events:all}
+
+    .modal{
+      width:100%;max-width:480px;
+      background:var(--bg);border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+      padding:0 1.5rem 2.5rem;
+      transform:translateY(100%);transition:transform 0.25s cubic-bezier(0.32,0.72,0,1);
+    }
+    .modal-overlay.open .modal{transform:translateY(0)}
+
+    .modal-handle{width:36px;height:4px;background:var(--bg3);border-radius:2px;margin:14px auto 20px}
+
+    .modal-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .modal-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+    .modal-dot.wake{background:var(--blue-icon)}
+    .modal-dot.sleep{background:var(--purple-icon)}
+    .modal-dot.evan{background:var(--orange-icon)}
+    .modal-title{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--text)}
+
+    .time-section{margin-bottom:28px}
+    .time-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+    /* big time display + stepper */
+    .time-picker{display:flex;align-items:center;justify-content:center;gap:6px}
+
+    .time-segment{display:flex;flex-direction:column;align-items:center;gap:4px}
+
+    .seg-btn{
+      background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);
+      width:38px;height:32px;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;font-size:16px;color:var(--text2);touch-action:manipulation;
+      user-select:none;transition:background 0.1s;
+    }
+    .seg-btn:active{background:var(--bg3)}
+
+    .seg-value{
+      font-size:42px;letter-spacing:-1px;color:var(--text);
+      min-width:62px;text-align:center;line-height:1;cursor:default;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .time-colon{font-size:36px;color:var(--text3);line-height:1;padding-bottom:4px;align-self:center}
+
+    .ampm-toggle{
+      display:flex;flex-direction:column;gap:4px;margin-left:6px;align-self:center;
+    }
+    .ampm-btn{
+      background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);
+      padding:6px 10px;font-size:12px;letter-spacing:0.08em;
+      color:var(--text3);cursor:pointer;touch-action:manipulation;
+      font-family:'DM Mono',monospace;transition:background 0.1s,color 0.1s;
+    }
+    .ampm-btn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+    /* quick offset buttons */
+    .quick-offsets{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+    .offset-btn{
+      flex:1;min-width:60px;
+      background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);
+      padding:8px 6px;font-size:11px;letter-spacing:0.05em;color:var(--text2);
+      cursor:pointer;font-family:'DM Mono',monospace;text-align:center;
+      touch-action:manipulation;transition:background 0.1s,color 0.1s;
+    }
+    .offset-btn:active{background:var(--bg3)}
+
+    .modal-actions{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+    .btn-cancel{
+      background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-md);
+      padding:14px;font-size:13px;color:var(--text2);cursor:pointer;
+      font-family:'DM Mono',monospace;letter-spacing:0.05em;touch-action:manipulation;
+      transition:background 0.1s;
+    }
+    .btn-cancel:active{background:var(--bg3)}
+    .btn-confirm{
+      border:none;border-radius:var(--radius-md);
+      padding:14px;font-size:13px;font-weight:500;color:#fff;cursor:pointer;
+      font-family:'DM Mono',monospace;letter-spacing:0.06em;touch-action:manipulation;
+      transition:opacity 0.1s;
+    }
+    .btn-confirm:active{opacity:0.8}
+    .btn-confirm.wake{background:var(--blue-icon)}
+    .btn-confirm.sleep{background:var(--purple-icon)}
+    .btn-confirm.evan{background:var(--orange-icon)}
+
+    /* flash */
     .flash{animation:flashAnim 0.3s ease-out}
     @keyframes flashAnim{0%{opacity:0.35;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}
 
     /* log */
     .log-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .log-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3)}
-    .clear-btn{
-      font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;
-      padding:4px 8px;border-radius:var(--radius-sm);font-family:'DM Mono',monospace;
-      touch-action:manipulation;letter-spacing:0.04em;
-    }
+    .clear-btn{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);font-family:'DM Mono',monospace;touch-action:manipulation;letter-spacing:0.04em}
     .clear-btn:active{color:var(--red);background:var(--red-bg)}
     @media(hover:hover){.clear-btn:hover{color:var(--red);background:var(--red-bg)}}
 
-    .log-empty{
-      text-align:center;padding:3rem 1rem;font-size:13px;color:var(--text3);
-      border:0.5px dashed var(--border2);border-radius:var(--radius-md);line-height:1.7;
-    }
+    .log-empty{text-align:center;padding:3rem 1rem;font-size:13px;color:var(--text3);border:0.5px dashed var(--border2);border-radius:var(--radius-md);line-height:1.7}
 
-    /* skeleton loader */
     .skeleton-group{margin-bottom:20px}
     .skeleton-label{height:12px;width:80px;background:var(--bg3);border-radius:4px;margin-bottom:10px;animation:shimmer 1.4s infinite}
     .skeleton-row{display:flex;gap:0;margin-bottom:6px;align-items:stretch}
@@ -114,12 +197,8 @@
     .skeleton-text.wide{width:70%} .skeleton-text.narrow{width:40%}
     @keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.4}}
 
-    /* day group */
     .day-group{margin-bottom:20px}
-    .day-label{
-      font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);
-      margin-bottom:8px;display:flex;align-items:center;gap:10px;
-    }
+    .day-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:10px}
     .day-label::after{content:'';flex:1;height:0.5px;background:var(--border2)}
 
     .entry-row{display:flex;align-items:stretch;gap:0;margin-bottom:4px;animation:slideIn 0.18s ease-out}
@@ -130,41 +209,70 @@
     .strip-dot.wake{background:var(--blue-icon)} .strip-dot.sleep{background:var(--purple-icon)} .strip-dot.evan{background:var(--orange-icon)}
     .strip-line{width:1.5px;flex:1;min-height:8px;background:var(--border2);margin-top:4px}
 
-    .entry-card{
-      flex:1;background:var(--bg2);border-radius:var(--radius-md);
-      padding:10px 12px 10px 10px;display:flex;align-items:center;gap:10px;
-      border:0.5px solid var(--border);
-    }
+    .entry-card{flex:1;background:var(--bg2);border-radius:var(--radius-md);padding:10px 12px 10px 10px;display:flex;align-items:center;gap:10px;border:0.5px solid var(--border)}
     .entry-info{flex:1;display:flex;flex-direction:column;gap:3px}
     .entry-type-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
     .entry-type-label.wake{color:var(--blue-label)} .entry-type-label.sleep{color:var(--purple-label)} .entry-type-label.evan{color:var(--orange-label)}
     .entry-time-big{font-size:18px;color:var(--text);letter-spacing:-0.02em;line-height:1.1}
-    .entry-dur{font-size:11px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:5px}
-    .dur-pill{
-      display:inline-flex;align-items:center;gap:4px;
-      padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500;
-    }
+    .entry-dur{font-size:11px;color:var(--text3);margin-top:2px}
+    .dur-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500}
     .dur-pill.wake{background:var(--blue-bg);color:var(--blue-text)}
     .dur-pill.sleep{background:var(--purple-bg);color:var(--purple-text)}
-    .entry-del{
-      background:none;border:none;cursor:pointer;color:var(--text3);
-      padding:6px;border-radius:var(--radius-sm);line-height:1;font-size:14px;
-      touch-action:manipulation;flex-shrink:0;align-self:flex-start;
-    }
+    .entry-del{background:none;border:none;cursor:pointer;color:var(--text3);padding:6px;border-radius:var(--radius-sm);line-height:1;font-size:14px;touch-action:manipulation;flex-shrink:0;align-self:flex-start}
     .entry-del:active{color:var(--red)}
-
-    /* stale notice banner */
-    .stale-banner{
-      display:none;background:var(--orange-bg);border:0.5px solid var(--orange-border);
-      border-radius:var(--radius-md);padding:10px 14px;font-size:12px;color:var(--orange-label);
-      text-align:center;letter-spacing:0.03em;
-    }
-    .stale-banner.visible{display:block}
   </style>
 </head>
 <body>
-<div class="app">
 
+<!-- TIME PICKER MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-dot" id="modal-dot"></span>
+      <span class="modal-title" id="modal-title"></span>
+    </div>
+
+    <div class="time-section">
+      <div class="time-label">time</div>
+      <div class="time-picker">
+        <!-- hours -->
+        <div class="time-segment">
+          <button class="seg-btn" onclick="adjustTime('h',1)">▲</button>
+          <span class="seg-value" id="seg-h">12</span>
+          <button class="seg-btn" onclick="adjustTime('h',-1)">▼</button>
+        </div>
+        <span class="time-colon">:</span>
+        <!-- minutes -->
+        <div class="time-segment">
+          <button class="seg-btn" onclick="adjustTime('m',1)">▲</button>
+          <span class="seg-value" id="seg-m">00</span>
+          <button class="seg-btn" onclick="adjustTime('m',-1)">▼</button>
+        </div>
+        <!-- am/pm -->
+        <div class="ampm-toggle">
+          <button class="ampm-btn" id="btn-am" onclick="setAmPm('AM')">AM</button>
+          <button class="ampm-btn" id="btn-pm" onclick="setAmPm('PM')">PM</button>
+        </div>
+      </div>
+
+      <!-- quick offsets -->
+      <div class="quick-offsets">
+        <button class="offset-btn" onclick="applyOffset(-30)">−30 min</button>
+        <button class="offset-btn" onclick="applyOffset(-15)">−15 min</button>
+        <button class="offset-btn" onclick="applyOffset(0)">now</button>
+        <button class="offset-btn" onclick="applyOffset(15)">+15 min</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">cancel</button>
+      <button class="btn-confirm" id="btn-confirm" onclick="confirmLog()">log it</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
   <div class="header">
     <h1>Kids Sleep Log</h1>
     <div class="subtitle" id="today-date"></div>
@@ -177,12 +285,10 @@
     <span id="sync-msg">loading...</span>
   </div>
 
-  <div class="stale-banner" id="stale-banner">
-    showing cached data — syncing in background
-  </div>
+  <div class="stale-banner" id="stale-banner">showing cached data — syncing in background</div>
 
   <div class="buttons">
-    <button class="btn-log btn-wake" id="btn-wake" onclick="logEvent('wake')">
+    <button class="btn-log btn-wake" id="btn-wake" onclick="openModal('wake')">
       <span class="b-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4"/>
@@ -195,7 +301,7 @@
       <span class="b-label">Neil woke up</span>
       <span class="b-hint" id="wake-hint"></span>
     </button>
-    <button class="btn-log btn-sleep" id="btn-sleep" onclick="logEvent('sleep')">
+    <button class="btn-log btn-sleep" id="btn-sleep" onclick="openModal('sleep')">
       <span class="b-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -206,7 +312,7 @@
     </button>
   </div>
 
-  <button class="btn-evan" id="btn-evan" onclick="logEvan()">
+  <button class="btn-evan" id="btn-evan" onclick="openModal('evan')">
     ☀️ Evan Woke Up!
   </button>
 
@@ -218,27 +324,125 @@
     <div class="log-empty" id="empty-msg" style="display:none">no entries yet<br>tap a button to start logging</div>
     <div id="log-list"></div>
   </div>
-
 </div>
+
 <script>
   // ── PASTE YOUR APPS SCRIPT URL HERE ──────────────────────────────────────────
   const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
   // ─────────────────────────────────────────────────────────────────────────────
 
-  const KEY       = 'sleeplog_v3';       // entries cache
-  const META_KEY  = 'sleeplog_meta';     // last sync timestamp
-  const SYNC_TTL  = 30 * 1000;          // consider cache fresh for 30s
+  const KEY      = 'sleeplog_v3';
+  const META_KEY = 'sleeplog_meta';
+  const SYNC_TTL = 30 * 1000;
 
   let entries = [];
   let syncInFlight = false;
 
-  // ── local storage ──
+  // ── modal state ──
+  let modalType  = null;
+  let pickerHour = 12;   // 1–12
+  let pickerMin  = 0;
+  let pickerAmPm = 'AM';
+
+  // ── modal ──
+  function openModal(type) {
+    modalType = type;
+    const now = new Date();
+    let h = now.getHours(), m = now.getMinutes();
+    pickerAmPm = h >= 12 ? 'PM' : 'AM';
+    pickerHour = h % 12 || 12;
+    pickerMin  = m;
+    syncPickerUI();
+
+    const titles = { wake:'Neil woke up', sleep:'Neil fell asleep', evan:'Evan woke up' };
+    document.getElementById('modal-title').textContent = titles[type];
+    document.getElementById('modal-dot').className  = 'modal-dot ' + type;
+    const confirm = document.getElementById('btn-confirm');
+    confirm.className = 'btn-confirm ' + type;
+
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+    modalType = null;
+  }
+
+  function overlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function syncPickerUI() {
+    document.getElementById('seg-h').textContent = String(pickerHour).padStart(2, '0');
+    document.getElementById('seg-m').textContent = String(pickerMin).padStart(2, '0');
+    document.getElementById('btn-am').className = 'ampm-btn' + (pickerAmPm === 'AM' ? ' active' : '');
+    document.getElementById('btn-pm').className = 'ampm-btn' + (pickerAmPm === 'PM' ? ' active' : '');
+  }
+
+  function adjustTime(part, delta) {
+    if (part === 'h') {
+      pickerHour = ((pickerHour - 1 + delta + 12) % 12) + 1;
+    } else {
+      pickerMin = (pickerMin + delta + 60) % 60;
+    }
+    syncPickerUI();
+  }
+
+  function setAmPm(val) {
+    pickerAmPm = val;
+    syncPickerUI();
+  }
+
+  function applyOffset(mins) {
+    const now = new Date();
+    const adjusted = new Date(now.getTime() + mins * 60000);
+    let h = adjusted.getHours(), m = adjusted.getMinutes();
+    pickerAmPm = h >= 12 ? 'PM' : 'AM';
+    pickerHour = h % 12 || 12;
+    pickerMin  = m;
+    syncPickerUI();
+  }
+
+  function getPickerTimestamp() {
+    const now = new Date();
+    let h24 = pickerHour % 12;
+    if (pickerAmPm === 'PM') h24 += 12;
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h24, pickerMin, 0, 0);
+    // if the resulting time is more than 12h in the future, assume yesterday
+    if (d.getTime() - now.getTime() > 12 * 3600 * 1000) d.setDate(d.getDate() - 1);
+    return d.getTime();
+  }
+
+  async function confirmLog() {
+    if (!modalType) return;
+    const type = modalType;
+    const ts   = getPickerTimestamp();
+    closeModal();
+
+    const btnId = type === 'evan' ? 'btn-evan' : 'btn-' + type;
+    const btn   = document.getElementById(btnId);
+
+    const entry = { type, ts, id: null };
+    entries.push(entry);
+    entries.sort((a, b) => a.ts - b.ts);
+    localSave(); renderLog();
+    setSyncStatus('syncing', 'saving...');
+    await pushEntry(entry);
+    localSave();
+    btn.classList.remove('flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
+  }
+
+  // ── storage ──
   function localSave()  { try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch {} }
   function localLoad()  { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
   function saveMeta(ts) { try { localStorage.setItem(META_KEY, String(ts)); } catch {} }
   function loadMeta()   { try { return parseInt(localStorage.getItem(META_KEY) || '0'); } catch { return 0; } }
 
-  // ── sync status UI ──
+  // ── sync ──
   function setSyncStatus(state, msg) {
     const bar = document.getElementById('sync-bar');
     bar.className = 'sync-bar ' + state;
@@ -251,57 +455,41 @@
 
   const hasScript = SCRIPT_URL && SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE';
 
-  // ── INSTANT LOAD: show local cache immediately, sync in background ──
   function initLoad() {
     const cached = localLoad();
     if (cached.length > 0) {
       entries = cached;
-      renderLog();                        // show immediately from cache
+      renderLog();
       const age = Date.now() - loadMeta();
-      if (age < SYNC_TTL) {
-        setSyncStatus('synced', 'synced');
-        return;                           // cache is fresh, skip fetch
-      }
-      showStaleBanner(true);             // cache is stale, show notice
+      if (age < SYNC_TTL) { setSyncStatus('synced', 'synced'); return; }
+      showStaleBanner(true);
       setSyncStatus('stale', 'refreshing...');
     } else {
       renderLog();
       setSyncStatus('syncing', 'loading...');
     }
-
     if (hasScript) backgroundSync();
     else setSyncStatus('', 'local only');
   }
 
-  // ── background sync: fetch without blocking UI ──
   async function backgroundSync() {
     if (syncInFlight) return;
     syncInFlight = true;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      const timeout = setTimeout(() => controller.abort(), 15000);
       const res = await fetch(SCRIPT_URL + '?action=getAll', { signal: controller.signal });
       clearTimeout(timeout);
       const data = await res.json();
-      if (!data.ok) throw new Error('bad response');
+      if (!data.ok) throw new Error();
       const fresh = data.entries.map(e => ({ id: e.id, type: e.type, ts: Number(e.ts) }));
       fresh.sort((a, b) => a.ts - b.ts);
-
-      // only re-render if data actually changed
-      if (JSON.stringify(fresh) !== JSON.stringify(entries)) {
-        entries = fresh;
-        localSave();
-        renderLog();
-      }
+      if (JSON.stringify(fresh) !== JSON.stringify(entries)) { entries = fresh; localSave(); renderLog(); }
       saveMeta(Date.now());
       showStaleBanner(false);
       setSyncStatus('synced', 'synced');
     } catch (err) {
-      if (err.name === 'AbortError') {
-        setSyncStatus('error', 'sync timed out — showing cached');
-      } else {
-        setSyncStatus('error', 'sync failed — showing cached');
-      }
+      setSyncStatus('error', err.name === 'AbortError' ? 'sync timed out — showing cached' : 'sync failed — showing cached');
       showStaleBanner(false);
     }
     syncInFlight = false;
@@ -312,11 +500,7 @@
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ type: entry.type, ts: entry.ts }),
-        signal: controller.signal
-      });
+      const res = await fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify({ type:entry.type, ts:entry.ts }), signal:controller.signal });
       clearTimeout(timeout);
       const data = await res.json();
       if (data.ok) { entry.id = data.id; saveMeta(Date.now()); setSyncStatus('synced', 'synced'); }
@@ -326,10 +510,8 @@
 
   async function deleteRemote(id) {
     if (!hasScript || !id) return;
-    try {
-      await fetch(SCRIPT_URL + '?action=delete&id=' + encodeURIComponent(id));
-      setSyncStatus('synced', 'synced');
-    } catch { setSyncStatus('error', 'local delete only'); }
+    try { await fetch(SCRIPT_URL + '?action=delete&id=' + encodeURIComponent(id)); setSyncStatus('synced', 'synced'); }
+    catch { setSyncStatus('error', 'local delete only'); }
   }
 
   async function clearRemote() {
@@ -342,52 +524,39 @@
   function fmtTime(ts) {
     return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', hour12:true });
   }
-
   function fmtDur(ms) {
-    const t = Math.round(ms / 60000), h = Math.floor(t / 60), m = t % 60;
-    if (h === 0) return m + 'm';
-    if (m === 0) return h + 'h';
-    return h + 'h ' + m + 'm';
+    const t = Math.round(ms/60000), h = Math.floor(t/60), m = t%60;
+    if (h===0) return m+'m'; if (m===0) return h+'h'; return h+'h '+m+'m';
   }
-
-  function dayKey(ts) {
-    const d = new Date(ts);
-    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-  }
-
+  function dayKey(ts) { const d=new Date(ts); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
   function dayLabel(ts) {
-    const d = new Date(ts), today = new Date(), yest = new Date(today);
-    yest.setDate(today.getDate() - 1);
-    if (d.toDateString() === today.toDateString()) return 'today';
-    if (d.toDateString() === yest.toDateString()) return 'yesterday';
-    return d.toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+    const d=new Date(ts), today=new Date(), yest=new Date(today);
+    yest.setDate(today.getDate()-1);
+    if (d.toDateString()===today.toDateString()) return 'today';
+    if (d.toDateString()===yest.toDateString()) return 'yesterday';
+    return d.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'});
   }
-
   function entryLabel(type) {
-    if (type === 'wake')  return 'Neil woke up';
-    if (type === 'sleep') return 'Neil fell asleep';
-    if (type === 'evan')  return 'Evan woke up';
+    if (type==='wake')  return 'Neil woke up';
+    if (type==='sleep') return 'Neil fell asleep';
+    if (type==='evan')  return 'Evan woke up';
     return type;
   }
-
-  function getPrevOfType(allEntries, idx, type) {
-    for (let i = idx - 1; i >= 0; i--) {
-      if (allEntries[i].type === type) return allEntries[i];
-    }
+  function getPrevOfType(all, idx, type) {
+    for (let i=idx-1;i>=0;i--) { if (all[i].type===type) return all[i]; }
     return null;
   }
 
-  // ── skeleton loader ──
+  // ── skeleton ──
   function renderSkeleton() {
-    const list = document.getElementById('log-list');
-    list.innerHTML = `
+    document.getElementById('log-list').innerHTML = `
       <div class="skeleton-group">
         <div class="skeleton-label"></div>
-        ${[1,2,3].map((_, i) => `
+        ${[0,1,2].map((_, i) => `
           <div class="skeleton-row">
             <div class="skeleton-strip">
               <div class="skeleton-dot"></div>
-              ${i < 2 ? '<div class="skeleton-line"></div>' : ''}
+              ${i<2?'<div class="skeleton-line"></div>':''}
             </div>
             <div class="skeleton-card">
               <div class="skeleton-text narrow"></div>
@@ -397,28 +566,25 @@
       </div>`;
   }
 
-  // ── main render ──
+  // ── render ──
   function renderLog() {
     const list  = document.getElementById('log-list');
     const empty = document.getElementById('empty-msg');
     list.innerHTML = '';
+    if (entries.length===0) { empty.style.display='block'; return; }
+    empty.style.display='none';
 
-    if (entries.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-
-    // group by day
-    const groups = {}, groupOrder = [];
-    entries.forEach((e, i) => {
-      const k = dayKey(e.ts);
-      if (!groups[k]) { groups[k] = []; groupOrder.unshift(k); }
-      groups[k].push({ ...e, _origIdx: i });
+    const groups={}, groupOrder=[];
+    entries.forEach((e,i) => {
+      const k=dayKey(e.ts);
+      if (!groups[k]) { groups[k]=[]; groupOrder.unshift(k); }
+      groups[k].push({...e, _origIdx:i});
     });
 
     groupOrder.forEach(k => {
       const dayEntries = groups[k].slice().reverse();
       const wrapper = document.createElement('div');
       wrapper.className = 'day-group';
-
       const lbl = document.createElement('div');
       lbl.className = 'day-label';
       lbl.textContent = dayLabel(dayEntries[0].ts);
@@ -427,116 +593,80 @@
       dayEntries.forEach((e, di) => {
         const origIdx = e._origIdx;
         let durHTML = '';
-        if (e.type === 'wake') {
-          const prev = getPrevOfType(entries, origIdx, 'sleep');
-          if (prev) durHTML = `<span class="dur-pill wake">slept ${fmtDur(e.ts - prev.ts)}</span>`;
-        } else if (e.type === 'sleep') {
-          const prev = getPrevOfType(entries, origIdx, 'wake');
-          if (prev) durHTML = `<span class="dur-pill sleep">awake ${fmtDur(e.ts - prev.ts)}</span>`;
+        if (e.type==='wake') {
+          const prev=getPrevOfType(entries,origIdx,'sleep');
+          if (prev) durHTML=`<span class="dur-pill wake">slept ${fmtDur(e.ts-prev.ts)}</span>`;
+        } else if (e.type==='sleep') {
+          const prev=getPrevOfType(entries,origIdx,'wake');
+          if (prev) durHTML=`<span class="dur-pill sleep">awake ${fmtDur(e.ts-prev.ts)}</span>`;
         }
-
-        const isLast = di === dayEntries.length - 1;
-        const safeId = encodeURIComponent(e.id || '');
-
+        const isLast = di===dayEntries.length-1;
+        const safeId = encodeURIComponent(e.id||'');
         const row = document.createElement('div');
         row.className = 'entry-row';
         row.innerHTML = `
           <div class="entry-strip">
             <span class="strip-dot ${e.type}"></span>
-            ${!isLast ? '<span class="strip-line"></span>' : ''}
+            ${!isLast?'<span class="strip-line"></span>':''}
           </div>
           <div class="entry-card">
             <div class="entry-info">
               <span class="entry-type-label ${e.type}">${entryLabel(e.type)}</span>
               <span class="entry-time-big">${fmtTime(e.ts)}</span>
-              ${durHTML ? `<div class="entry-dur">${durHTML}</div>` : ''}
+              ${durHTML?`<div class="entry-dur">${durHTML}</div>`:''}
             </div>
             <button class="entry-del" aria-label="delete" onclick="deleteEntry(${origIdx},'${safeId}')">✕</button>
           </div>`;
         wrapper.appendChild(row);
       });
-
       list.appendChild(wrapper);
     });
-
     updateHints();
   }
 
   function updateHints() {
-    const last = entries.length ? entries[entries.length - 1] : null;
-    const wh = document.getElementById('wake-hint'), sh = document.getElementById('sleep-hint');
-    if (!last) { wh.textContent = ''; sh.textContent = ''; return; }
-    const now = Date.now();
-    if (last.type === 'sleep')      { wh.textContent = 'slept ' + fmtDur(now - last.ts); sh.textContent = ''; }
-    else if (last.type === 'wake')  { sh.textContent = 'awake ' + fmtDur(now - last.ts); wh.textContent = ''; }
-    else                            { wh.textContent = ''; sh.textContent = ''; }
-  }
-
-  async function logEvent(type) {
-    const btn = document.getElementById('btn-' + type);
-    btn.classList.add('loading');
-    const entry = { type, ts: Date.now(), id: null };
-    entries.push(entry);
-    localSave(); renderLog();
-    setSyncStatus('syncing', 'saving...');
-    await pushEntry(entry);
-    localSave();
-    btn.classList.remove('loading', 'flash');
-    void btn.offsetWidth;
-    btn.classList.add('flash');
-  }
-
-  async function logEvan() {
-    const btn = document.getElementById('btn-evan');
-    const entry = { type: 'evan', ts: Date.now(), id: null };
-    entries.push(entry);
-    localSave(); renderLog();
-    setSyncStatus('syncing', 'saving...');
-    await pushEntry(entry);
-    localSave();
-    btn.classList.remove('flash');
-    void btn.offsetWidth;
-    btn.classList.add('flash');
+    const last=entries.length?entries[entries.length-1]:null;
+    const wh=document.getElementById('wake-hint'), sh=document.getElementById('sleep-hint');
+    if (!last) { wh.textContent=''; sh.textContent=''; return; }
+    const now=Date.now();
+    if (last.type==='sleep')     { wh.textContent='slept '+fmtDur(now-last.ts); sh.textContent=''; }
+    else if (last.type==='wake') { sh.textContent='awake '+fmtDur(now-last.ts); wh.textContent=''; }
+    else                         { wh.textContent=''; sh.textContent=''; }
   }
 
   async function deleteEntry(idx, encodedId) {
-    const id = decodeURIComponent(encodedId);
-    entries.splice(idx, 1);
-    localSave(); renderLog();
-    setSyncStatus('syncing', 'deleting...');
+    const id=decodeURIComponent(encodedId);
+    entries.splice(idx,1); localSave(); renderLog();
+    setSyncStatus('syncing','deleting...');
     await deleteRemote(id);
   }
 
   async function clearLog() {
     if (!entries.length) return;
     if (!confirm('Clear all entries?')) return;
-    entries = []; localSave(); renderLog();
-    setSyncStatus('syncing', 'clearing...');
+    entries=[]; localSave(); renderLog();
+    setSyncStatus('syncing','clearing...');
     await clearRemote();
   }
 
   // ── clock ──
   function tick() {
     document.getElementById('live-clock').textContent =
-      new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+      new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
     updateHints();
   }
 
   document.getElementById('today-date').textContent =
-    new Date().toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+    new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'});
 
-  // show skeleton only if no cache
-  if (localLoad().length === 0) renderSkeleton();
-
+  if (localLoad().length===0) renderSkeleton();
   tick();
   setInterval(tick, 1000);
   initLoad();
 
-  // re-sync when tab becomes visible again (e.g. switching back from another app)
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && hasScript) {
-      const age = Date.now() - loadMeta();
-      if (age > SYNC_TTL) backgroundSync();
+    if (document.visibilityState==='visible' && hasScript) {
+      if (Date.now()-loadMeta() > SYNC_TTL) backgroundSync();
     }
   });
 </script>
